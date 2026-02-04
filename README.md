@@ -1,3 +1,3 @@
-# Webprgramming-Module
+# Webprogramming-Module
 
-Creating a Website for a Module in the University. Including Frontend and Backend. Frontend has priority, but API communication should the REST-API architecture.
+Creating a Website for Webprogramming at university. Including Frontend and Backend. Frontend has priority, but communication between Front- and Backend should be REST-API architecture.
