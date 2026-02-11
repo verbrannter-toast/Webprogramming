@@ -1,0 +1,41 @@
+{
+  "name": "streaming-service",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev-frontend\" \"npm run dev-backend\"",
+    "build": "next build",
+    "start": "next start",
+    "dev-frontend": "next dev",
+    "dev-backend": "node --watch --import=tsx backend/server.ts",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.6.2",
+    "concurrently": "^9.2.1",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "next": "16.1.6",
+    "node-ts": "^8.0.11",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-router-dom": "^7.13.0",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7",
+    "ts-node": "^10.9.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^20.19.33",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "tailwindcss": "^4",
+    "tsx": "^4.21.0",
+    "typescript": "^5"
+  }
+}
