@@ -8,48 +8,40 @@ import { Navbar } from './components/navbar';
 // --- Types & Config ---
 interface Movie {
   id: number;
+  genre: string;
   title: string;
   image: string;
 }
 
 const API_URL = 'http://localhost:5000';
-// Mocking a logged-in user
-const CURRENT_USER_ID = 1; 
 
 const FEATURED_MOVIE = {
-  title: "Cool Movie",
-  description: "A really cool movie you have to watch",
-  image: ""
+  title: "The Godfather",
+  description: "Spanning the years 1945 to 1955, a chronicle of the fictional Italian-American Corleone crime family. When organized crime family patriarch, Vito Corleone barely survives an attempt on his life, his youngest son, Michael steps in to take care of the would-be killers, launching a campaign of bloody revenge.",
+  image: "https://wallpapercave.com/wp/wp12115424.jpg"
 };
-
-const MOVIES: Movie[] = [
-  { id: 101, title: "Comedy Movie", image: "" },
-  { id: 102, title: "Action Movie", image: "" },
-  { id: 103, title: "Horror Movie", image: "" },
-  { id: 104, title: "Romance", image: "" },
-  { id: 105, title: "Documentary", image: "" },
-];
 
 // --- Sub-Components ---
 
-const Row = ({ title, movies }: { title: string; movies: Movie[] }) => {
+const Row = ({ title, movies, userId }: { title: string; movies: Movie[]; userId: string | null }) => {
   const [watchlist, setWatchlist] = useState<number[]>([]);
 
-  // 1. Fetch current watchlist on mount
+  // fetch the watchlist for this user on mount or when userId changes
   useEffect(() => {
-    fetch(`${API_URL}/watchlist/${CURRENT_USER_ID}`)
+    fetch(`${API_URL}/watchlist/${userId}`)
       .then(res => res.json())
       .then(data => setWatchlist(data))
       .catch(err => console.error("Backend not running?", err));
-  }, []);
+  }, [userId]);
 
-  // 2. Toggle item in backend and update UI
+  // toggle function to add/remove from watchlist
   const toggleWatchlist = async (movieId: number) => {
+    if (!userId) return alert("Please login to use the watchlist!");
     try {
       const response = await fetch(`${API_URL}/watchlist/toggle`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: CURRENT_USER_ID, movieId })
+        body: JSON.stringify({ userId: userId, movieId })
       });
       const data = await response.json();
       
@@ -64,16 +56,22 @@ const Row = ({ title, movies }: { title: string; movies: Movie[] }) => {
   return (
     <div className="px-4 md:px-12 py-4 space-y-2">
       <h2 className="text-xl md:text-2xl font-semibold text-gray-100">{title}</h2>
-      <div className="flex gap-4 overflow-x-scroll scrollbar-hide py-4">
+      <div className="flex gap-4 overflow-x-auto py-4 items-start">
         {movies.map((movie) => {
           const isAdded = watchlist.includes(movie.id);
           return (
-            <div key={movie.id} className="group relative min-w-[200px] md:min-w-[280px] aspect-video bg-zinc-800 rounded-md overflow-hidden hover:scale-105 transition duration-300 shadow-xl cursor-pointer">
-              <img src={movie.image} alt={movie.title} className="w-full h-full object-cover" />
-              
+            <div
+              key={movie.id}
+              className="group relative shrink-0 w-40 h-75 md:w-70 md:h-105 bg-zinc-800 rounded-md overflow-hidden hover:scale-105 transition duration-300 shadow-xl cursor-pointer"
+            >
+              <img
+                src={movie.image}
+                alt={movie.title}
+                className="w-full h-full object-cover"
+              />
               {/* Hover Overlay */}
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-                <div className="flex items-center gap-2">
+                <div className="flex-none items-center gap-2">
                   <button 
                     onClick={() => toggleWatchlist(movie.id)}
                     className="p-2 bg-white rounded-full text-black hover:bg-gray-200 transition"
@@ -94,6 +92,26 @@ const Row = ({ title, movies }: { title: string; movies: Movie[] }) => {
 // --- Main Page ---
 
 export default function Home() {
+  const [userId, setUserId] = useState<string | null>(null);
+  const [allMovies, setAllMovies] = useState<Movie[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // get user
+    const savedId = localStorage.getItem('userId');
+    if (savedId) setUserId(savedId);
+
+    // fetch movies from backend
+    fetch('http://127.0.0.1:5000/movies')
+      .then(res => res.json())
+      .then(data => {
+        setAllMovies(data);
+        setLoading(false);
+      });
+  }, []);
+
+  const genres = Array.from(new Set(allMovies.map(m => m.genre)));
+
   return (
     <div className="bg-[#141414] min-h-screen text-white overflow-x-hidden">
       <Navbar />
@@ -115,7 +133,16 @@ export default function Home() {
 
       {/* Movie Rows */}
       <div className="relative z-10 -mt-32 pb-20">
-        <Row title="Trending Now" movies={MOVIES} />
+        <Row title="Trending Now" movies={allMovies} userId={userId} />
+        {/* map through genres and filter movies for each row */}
+        {genres.map(genre => (
+          <Row 
+            key={genre} 
+            title={genre} 
+            movies={allMovies.filter(m => m.genre === genre)} 
+            userId={userId} 
+          />
+        ))}
       </div>
     </div>
   );

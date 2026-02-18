@@ -1,0 +1,39 @@
+[
+  { "id": 101, "genre": "Comedy", "title": "Deadpool & Wolverine", "image": "https://image.tmdb.org/t/p/w500/h34b8gn6m1fzNpEhSpMZAgknwjX.jpg" },
+  { "id": 102, "genre": "Action", "title": "The Dark Knight", "image": "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg" },
+  { "id": 103, "genre": "Horror", "title": "The Conjuring", "image": "https://image.tmdb.org/t/p/w500/wVYREutTvI2tmxr6ujrHT704wGF.jpg" },
+  { "id": 104, "genre": "Romance", "title": "La La Land", "image": "https://image.tmdb.org/t/p/w500/uDO8zWDhfWwoFdKS4fzkUJt0Rf0.jpg" },
+  { "id": 105, "genre": "Documentary", "title": "Free Solo", "image": "https://www.themoviedb.org/t/p/w1280/v4QfYZMACODlWul9doN9RxE99ag.jpg" },
+
+  { "id": 106, "genre": "Action", "title": "John Wick", "image": "https://image.tmdb.org/t/p/w500/fZPSd91yGE9fCcCe6OoQr6E3Bev.jpg" },
+  { "id": 107, "genre": "Action", "title": "Mad Max: Fury Road", "image": "https://image.tmdb.org/t/p/w500/8tZYtuWezp8JbcsvHYO0O46tFbo.jpg" },
+  { "id": 108, "genre": "Action", "title": "Gladiator", "image": "https://image.tmdb.org/t/p/w500/ty8TGRuvJLPUmAR1H1nRIsgwvim.jpg" },
+
+  { "id": 109, "genre": "Comedy", "title": "The Hangover", "image": "https://image.tmdb.org/t/p/w500/uluhlXubGu1VxU63X9VHCLWDAYP.jpg" },
+  { "id": 110, "genre": "Comedy", "title": "Superbad", "image": "https://image.tmdb.org/t/p/w500/ek8e8txUyUwd2BNqj6lFEerJfbq.jpg" },
+  { "id": 111, "genre": "Comedy", "title": "Step Brothers", "image": "https://www.themoviedb.org/t/p/w1280/nvggBbEraUTAVR6ffP3AaBUWSHs.jpg" },
+
+  { "id": 112, "genre": "Horror", "title": "Hereditary", "image": "https://image.tmdb.org/t/p/w500/lHV8HHlhwNup2VbpiACtlKzaGIQ.jpg" },
+  { "id": 113, "genre": "Horror", "title": "It", "image": "https://image.tmdb.org/t/p/w500/9E2y5Q7WlCVNEhP5GiVTjhEhx1o.jpg" },
+  { "id": 114, "genre": "Horror", "title": "A Quiet Place", "image": "https://image.tmdb.org/t/p/w500/nAU74GmpUk7t5iklEp3bufwDq4n.jpg" },
+
+  { "id": 115, "genre": "Romance", "title": "The Notebook", "image": "https://image.tmdb.org/t/p/w500/qom1SZSENdmHFNZBXbtJAU0WTlC.jpg" },
+  { "id": 116, "genre": "Romance", "title": "Titanic", "image": "https://image.tmdb.org/t/p/w500/9xjZS2rlVxm8SFx8kPC3aIGCOYQ.jpg" },
+  { "id": 117, "genre": "Romance", "title": "Before Sunrise", "image": "https://www.themoviedb.org/t/p/w1280/kf1Jb1c2JAOqjuzA3H4oDM263uB.jpg" },
+
+  { "id": 118, "genre": "Documentary", "title": "The Last Dance", "image": "https://www.themoviedb.org/t/p/w1280/oVf4xGGbDtwVHiKn8uTuSriY7PH.jpg" },
+  { "id": 119, "genre": "Documentary", "title": "Planet Earth", "image": "https://www.themoviedb.org/t/p/w1280/bNcNxUtZ520d5de5s78onoiSiwQ.jpg" },
+  { "id": 120, "genre": "Documentary", "title": "The Social Dilemma", "image": "https://www.themoviedb.org/t/p/w1280/jcaM6V2tCtu6iMHDsGLBUbaYgYp.jpg" },
+
+  { "id": 121, "genre": "Sci-Fi", "title": "Inception", "image": "https://image.tmdb.org/t/p/w500/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg" },
+  { "id": 122, "genre": "Sci-Fi", "title": "Interstellar", "image": "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg" },
+  { "id": 123, "genre": "Sci-Fi", "title": "Blade Runner 2049", "image": "https://image.tmdb.org/t/p/w500/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg" },
+
+  { "id": 124, "genre": "Drama", "title": "The Shawshank Redemption", "image": "https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg" },
+  { "id": 125, "genre": "Drama", "title": "Fight Club", "image": "https://image.tmdb.org/t/p/w500/bptfVGEQuv6vDTIMVCHjJ9Dz8PX.jpg" },
+  { "id": 126, "genre": "Drama", "title": "Forrest Gump", "image": "https://image.tmdb.org/t/p/w500/arw2vcBveWOVZr6pxd9XTd1TdQa.jpg" },
+
+  { "id": 127, "genre": "Animation", "title": "Spider-Man: Into the Spider-Verse", "image": "https://image.tmdb.org/t/p/w500/iiZZdoQBEYBv6id8su7ImL0oCbD.jpg" },
+  { "id": 128, "genre": "Animation", "title": "Toy Story", "image": "https://image.tmdb.org/t/p/w500/uXDfjJbdP4ijW5hWSBrPrlKpxab.jpg" },
+  { "id": 129, "genre": "Animation", "title": "Coco", "image": "https://image.tmdb.org/t/p/w500/gGEsBPAijhVUFoiNpgZXqRVWJt2.jpg" }
+]
