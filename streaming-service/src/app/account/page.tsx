@@ -4,127 +4,10 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 
-const SectionLayout  = ({
-  sectionTitle, children
-}: {
-  sectionTitle: string; children: React.ReactNode
-}) => {
-  return (
-    <div className="space-y-6">
-      <h3 className="text-3xl font-bold mb-8">{sectionTitle}</h3>
-      <div className="bg-zinc-900 p-6 rounded-lg space-y-4">
-        {children}
-      </div>
-    </div>
-  )
-}
+import AboutSection from './components/AboutSection';
+import PasswordSection from './components/PasswordSection';
+import SignoutSection from './components/SignoutSection';
 
-function AboutSection () {
-   return (
-      <SectionLayout sectionTitle='Account'>
-           <div>
-            <h4 className="text-lg font-semibold text-gray-300">Username</h4>
-            <p className="text-white mt-2">{/* Place username here*/}</p>
-          </div>
-          <div>
-            <h4 className="text-lg font-semibold text-gray-300">Email</h4>
-            <p className="text-white mt-2">{/* Place email here*/}</p>
-          </div>
-      </SectionLayout>
-      );
-}
-function PasswordSection () { 
-
-
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-
-  const handleUpdatePassword = async () => {
-    // validate and api call to backend for updating password
-  }
-
-    return (
-      <SectionLayout sectionTitle='Change Password'>
-          <input 
-            type="password" 
-            placeholder="Current Password" 
-            className="w-full p-3 rounded bg-zinc-800 text-white outline-none"
-          />
-          <input 
-            type="password" 
-            placeholder="New Password" 
-            className="w-full p-3 rounded bg-zinc-800 text-white outline-none"
-          />
-          <input 
-            type="password" 
-            placeholder="Confirm New Password" 
-            className="w-full p-3 rounded bg-zinc-800 text-white outline-none"
-          />
-          <ConfirmButton text="Update Password" onClick={handleUpdatePassword} />
-      </SectionLayout>
-
-    );
-}
-
-
-
-
-const ConfirmButton = ({ 
-  text, 
-  onClick 
-}: { 
-  text: string; 
-  onClick: () => void 
-}) => {
-  return (
-    <button
-      onClick={onClick}
-      className="bg-red-600 text-white px-6 py-2 rounded font-bold hover:bg-red-700 transition"
-     >
-      {text}
-    </button>
-  );
-}
-
-function SignoutSection() {
-    const router = useRouter();
-    
-    const handleSignOut = () => {
-      localStorage.removeItem('userId');
-      router.push('/login');
-    };
-
-     return (
-      <SectionLayout sectionTitle='Sign Out'>
-        <p className="text-gray-300">Are you sure you want to sign out?</p>
-        <ConfirmButton text="Confirm Sign Out" onClick={handleSignOut}/>
-      </SectionLayout>
-      );
-}
-
-const SidebarButton = ({
-  buttonText,
-  tabValue,
-  activeTab,
-  setActiveTab
-}: {
-  buttonText: string; 
-  tabValue: string;
-  activeTab: string;
-  setActiveTab: (tab: string) => void
-}) => {
-  return (
-    <button 
-          onClick={() => setActiveTab(tabValue)}
-          className={`w-full text-left p-3 rounded transition ${
-            activeTab === tabValue ? 'bg-red-600 text-white' : 'bg-zinc-800 text-gray-300 hover:bg-zinc-700'
-          }`}
-        >
-          {buttonText}
-    </button>
-  )
-}
 
  export default function Account() {
   const [activeTab, setActiveTab] = useState('about');
@@ -169,3 +52,26 @@ const SidebarButton = ({
   );
 }
 
+
+const SidebarButton = ({
+  buttonText,
+  tabValue,
+  activeTab,
+  setActiveTab
+}: {
+  buttonText: string; 
+  tabValue: string;
+  activeTab: string;
+  setActiveTab: (tab: string) => void
+}) => {
+  return (
+    <button 
+          onClick={() => setActiveTab(tabValue)}
+          className={`w-full text-left p-3 rounded transition ${
+            activeTab === tabValue ? 'bg-red-600 text-white' : 'bg-zinc-800 text-gray-300 hover:bg-zinc-700'
+          }`}
+        >
+          {buttonText}
+    </button>
+  )
+}
