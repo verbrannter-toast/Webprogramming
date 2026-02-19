@@ -10,6 +10,7 @@ export default function SignoutSection() {
     
     const handleSignOut = () => {
       localStorage.removeItem('userId');
+      localStorage.removeItem('userEmail');
       router.push('/login');
     };
 
