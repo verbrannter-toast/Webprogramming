@@ -3,12 +3,26 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+
+const SectionLayout  = ({
+  sectionTitle, children
+}: {
+  sectionTitle: string; children: React.ReactNode
+}) => {
+  return (
+    <div className="space-y-6">
+      <h3 className="text-3xl font-bold mb-8">{sectionTitle}</h3>
+      <div className="bg-zinc-900 p-6 rounded-lg space-y-4">
+        {children}
+      </div>
+    </div>
+  )
+}
+
 function AboutSection () {
    return (
-      <div className="space-y-6">
-        <h3 className="text-3xl font-bold mb-8">Account</h3>
-        <div className="bg-zinc-900 p-6 rounded-lg space-y-4">
-          <div>
+      <SectionLayout sectionTitle='Account'>
+           <div>
             <h4 className="text-lg font-semibold text-gray-300">Username</h4>
             <p className="text-white mt-2">{/* Place username here*/}</p>
           </div>
@@ -16,8 +30,7 @@ function AboutSection () {
             <h4 className="text-lg font-semibold text-gray-300">Email</h4>
             <p className="text-white mt-2">{/* Place email here*/}</p>
           </div>
-        </div>
-      </div>
+      </SectionLayout>
       );
 }
 function PasswordSection () { 
@@ -32,9 +45,7 @@ function PasswordSection () {
   }
 
     return (
-      <div className="space-y-6">
-        <h3 className="text-3xl font-bold mb-8">Change Password</h3>
-        <div className="bg-zinc-900 p-6 rounded-lg space-y-4">
+      <SectionLayout sectionTitle='Change Password'>
           <input 
             type="password" 
             placeholder="Current Password" 
@@ -51,12 +62,21 @@ function PasswordSection () {
             className="w-full p-3 rounded bg-zinc-800 text-white outline-none"
           />
           <ConfirmButton text="Update Password" onClick={handleUpdatePassword} />
-        </div>
-      </div>
+      </SectionLayout>
+
     );
 }
 
-const ConfirmButton = ({ text, onClick }: { text: string; onClick: () => void }) => {
+
+
+
+const ConfirmButton = ({ 
+  text, 
+  onClick 
+}: { 
+  text: string; 
+  onClick: () => void 
+}) => {
   return (
     <button
       onClick={onClick}
@@ -76,13 +96,10 @@ function SignoutSection() {
     };
 
      return (
-      <div className="space-y-6">
-        <h3 className="text-3xl font-bold mb-8">Sign Out</h3>
-        <div className="bg-zinc-900 p-6 rounded-lg space-y-4">
-          <p className="text-gray-300">Are you sure you want to sign out?</p>
-          <ConfirmButton text="Confirm Sign Out" onClick={handleSignOut}/>
-        </div>
-      </div>
+      <SectionLayout sectionTitle='Sign Out'>
+        <p className="text-gray-300">Are you sure you want to sign out?</p>
+        <ConfirmButton text="Confirm Sign Out" onClick={handleSignOut}/>
+      </SectionLayout>
       );
 }
 
