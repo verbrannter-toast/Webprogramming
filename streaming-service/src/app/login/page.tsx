@@ -31,7 +31,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex h-screen items-center justify-center bg-black">
+    <div className="flex h-screen items-center justify-center bg-[url('/assets/login-bg.png')] bg-no-repeat bg-cover">
       <form onSubmit={handleLogin} className="bg-zinc-900 p-10 rounded-lg w-96 space-y-6">
         <h1 className="text-white text-3xl font-bold">Sign In</h1>
         <input 
