@@ -19,8 +19,9 @@ export default function AccountPage() {
 
       const data = await res.json();
       if (data.success) {
-        // save the real user ID from the database
+        // save the real user ID and email from the database
         localStorage.setItem('userId', data.user.id.toString());
+        localStorage.setItem('userEmail', data.user.email);
         router.push('/');
       } else {
         alert("Login failed!");

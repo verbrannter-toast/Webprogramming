@@ -19,6 +19,7 @@ export const Navbar = () => {
   const handleSignInOut = () => {
     // 1. Remove user from storage
     localStorage.removeItem('userId');
+    localStorage.removeItem('userEmail');
     // 2. Close dropdown
     setShowDropdown(false);
     // 3. Redirect to login
