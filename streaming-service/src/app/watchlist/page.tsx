@@ -53,15 +53,15 @@ export default function Watchlist() {
   };
 
   return (
-    <div className="bg-[#141414] min-h-screen pt-24 px-4 md:px-24">
+    <div className="bg-[#141414] min-h-screen pt-24 px-4 md:px-12">
       <h1 className="text-white text-3xl font-bold mb-8">My List</h1>
       
       {myList.length === 0 ? (
         <p className="text-gray-500">Your watchlist is currently empty.</p>
       ) : (
-        <div className="grid grid-cols-4 md:grid-cols-2 lg:grid-cols-6 gap-9">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
           {myList.map((movie) => (
-            <div key={movie.id} className="group relative w-40 h-75 md:w-70 md:h-105 bg-zinc-800 rounded-md overflow-hidden hover:scale-105 transition duration-300">
+            <div key={movie.id} className="group relative aspect-auto bg-zinc-800 rounded-md overflow-hidden hover:scale-105 transition duration-300">
               <img src={movie.image} alt={movie.title} className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                 <button 
