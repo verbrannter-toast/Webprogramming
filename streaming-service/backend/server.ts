@@ -39,6 +39,7 @@ if (!testUser) {
     console.log("Seed complete: Use 'test@test.com' / 'password123' to login.");
 }
 
+//login
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
     
@@ -53,7 +54,21 @@ app.post('/login', (req, res) => {
     }
 });
 
+// register
+app.post('/register', (req, res) => {
+    const { email, password } = req.body;
+    
+    try {
+        const insert = db.prepare('INSERT INTO users (email, password) VALUES (?, ?)');
+        const result = insert.run(email, password);
+        res.json({ success: true, userId: result.lastInsertRowid });
+    } catch (err) {
+        // This triggers if the email is not unique
+        res.status(400).json({ success: false, message: "Email already exists" });
+    }
+});
 
+// update password
 app.post('/account/update-password', (req, res) => {
     const { userId, currentPassword, newPassword } = req.body;
     
