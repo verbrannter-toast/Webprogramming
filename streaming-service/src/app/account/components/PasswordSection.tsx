@@ -15,13 +15,13 @@ function PasswordSection () {
 
     if (newPassword !== confirmPassword) {
       alert("passwords don't match");
-      // TO-DO: it should displayed under the form on the page
+      // TO-DO: it should be displayed under the form on the page
       return;
     }
 
     if (newPassword === currentPassword){
       alert("the new password should differ from the old one");
-      // TO-DO: it should displayed under the form on the page
+      // TO-DO: it should be displayed under the form on the page
       return;
     }
 
