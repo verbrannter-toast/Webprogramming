@@ -40,7 +40,7 @@ export default function LoginPage() {
     <div className="relative min-h-screen w-full bg-login bg-cover bg-center flex items-center justify-center">
       <div className="absolute inset-0 bg-[url('/assets/login-bg.png')] bg-no-repeat bg-cover" />
       
-      <form onSubmit={handleSubmit} className="relative z-10 bg-black/75 p-16 rounded-md w-[450px] space-y-6">
+      <form onSubmit={handleSubmit} className="relative z-10 bg-black/75 p-16 rounded-md w-110 space-y-6">
         <h1 className="text-white text-3xl font-bold">
           {isRegistering ? 'Create Account' : 'Sign In'}
         </h1>
