@@ -19,6 +19,7 @@ export const Navbar = () => {
   const handleSignInOut = () => {
     // 1. Remove user from storage
     localStorage.removeItem('userId');
+    localStorage.removeItem('userEmail');
     // 2. Close dropdown
     setShowDropdown(false);
     // 3. Redirect to login
@@ -70,9 +71,6 @@ export const Navbar = () => {
             {/* Dropdown Menu */}
             {showDropdown && (
               <div className="absolute right-0 mt-4 w-48 bg-black border border-zinc-700 py-2 shadow-xl rounded">
-                <button 
-                  onClick={handleAccount}
-                  className="px-4 py-2 text-sm border-b border-zinc-700 text-zinc-400 w-full text-left">Account</button>
                 { !localStorage.getItem('userId') ? (
                   <button 
                     onClick={handleSignInOut}
@@ -80,11 +78,18 @@ export const Navbar = () => {
                     Sign In
                   </button>
                 ) : (
-                  <button 
-                    onClick={handleSignInOut}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-zinc-800 transition text-left">
-                    Sign Out
-                  </button>
+                  <>
+                    <button 
+                      onClick={handleAccount}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-zinc-800 transition text-left">
+                      Account
+                    </button>
+                    <button 
+                      onClick={handleSignInOut}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-zinc-800 transition text-left">
+                      Sign Out
+                    </button>
+                  </>
                 )}
               </div>
             )}

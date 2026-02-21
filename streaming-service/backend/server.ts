@@ -53,6 +53,29 @@ app.post('/login', (req, res) => {
     }
 });
 
+
+app.post('/account/update-password', (req, res) => {
+    const { userId, currentPassword, newPassword } = req.body;
+    
+    // Step 1: Verify current password
+    const user = db.prepare('SELECT id FROM users WHERE id = ? AND password = ?')
+                   .get(userId, currentPassword);
+    
+    if (!user) {
+        // Current password is wrong
+        return res.status(401).json({ 
+            success: false, 
+            message: "Current password is incorrect" 
+        });
+    }
+    
+    // Step 2: Update to new password
+    db.prepare('UPDATE users SET password = ? WHERE id = ?')
+      .run(newPassword, userId);
+    
+    res.json({ success: true, message: "Password updated successfully" });
+});
+
 // GET the watchlist for a specific user
 app.get('/watchlist/:userId', (req, res) => {
     const { userId } = req.params;

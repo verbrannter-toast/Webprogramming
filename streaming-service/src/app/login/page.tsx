@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function LoginPage() {
+export default function AccountPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
@@ -11,7 +11,7 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('http://127.0.0.1:5000/login', {
+      const res = await fetch('http://localhost:5000/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -19,8 +19,9 @@ export default function LoginPage() {
 
       const data = await res.json();
       if (data.success) {
-        // save the real user ID from the database
+        // save the real user ID and email from the database
         localStorage.setItem('userId', data.user.id.toString());
+        localStorage.setItem('userEmail', data.user.email);
         router.push('/');
       } else {
         alert("Login failed!");
