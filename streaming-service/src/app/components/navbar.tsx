@@ -19,6 +19,7 @@ export const Navbar = () => {
   const handleSignInOut = () => {
     // 1. Remove user from storage
     localStorage.removeItem('userId');
+    localStorage.removeItem('userEmail');
     // 2. Close dropdown
     setShowDropdown(false);
     // 3. Redirect to login
@@ -40,6 +41,15 @@ export const Navbar = () => {
           <ul className="hidden md:flex gap-6 text-sm text-zinc-300">
             <li><Link href="/" className="hover:text-white transition">Home</Link></li>
             <li><Link href="/watchlist" className="hover:text-white transition">My Watchlist</Link></li>
+            <>|</>
+            <li><Link href="/genres/comedy" className="hover:text-white transition">Comedy</Link></li>
+            <li><Link href="/genres/action" className="hover:text-white transition">Action</Link></li>
+            <li><Link href="/genres/horror" className="hover:text-white transition">Horror</Link></li>
+            <li><Link href="/genres/romance" className="hover:text-white transition">Romance</Link></li>
+            <li><Link href="/genres/sci-fi" className="hover:text-white transition">Sci-Fi</Link></li>
+            <li><Link href="/genres/drama" className="hover:text-white transition">Drama</Link></li>
+            <li><Link href="/genres/animation" className="hover:text-white transition">Animation</Link></li>
+            <li><Link href="/genres/documentary" className="hover:text-white transition">Documentary</Link></li>
           </ul>
         </div>
 
@@ -61,9 +71,6 @@ export const Navbar = () => {
             {/* Dropdown Menu */}
             {showDropdown && (
               <div className="absolute right-0 mt-4 w-48 bg-black border border-zinc-700 py-2 shadow-xl rounded">
-                <button 
-                  onClick={handleAccount}
-                  className="px-4 py-2 text-sm border-b border-zinc-700 text-zinc-400 w-full text-left">Account</button>
                 { !localStorage.getItem('userId') ? (
                   <button 
                     onClick={handleSignInOut}
@@ -71,11 +78,18 @@ export const Navbar = () => {
                     Sign In
                   </button>
                 ) : (
-                  <button 
-                    onClick={handleSignInOut}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-zinc-800 transition text-left">
-                    Sign Out
-                  </button>
+                  <>
+                    <button 
+                      onClick={handleAccount}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-zinc-800 transition text-left">
+                      Account
+                    </button>
+                    <button 
+                      onClick={handleSignInOut}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-zinc-800 transition text-left">
+                      Sign Out
+                    </button>
+                  </>
                 )}
               </div>
             )}

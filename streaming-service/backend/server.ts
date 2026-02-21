@@ -39,6 +39,7 @@ if (!testUser) {
     console.log("Seed complete: Use 'test@test.com' / 'password123' to login.");
 }
 
+//login
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
     
@@ -51,6 +52,43 @@ app.post('/login', (req, res) => {
     } else {
         res.status(401).json({ success: false, message: "Invalid credentials" });
     }
+});
+
+// register
+app.post('/register', (req, res) => {
+    const { email, password } = req.body;
+    
+    try {
+        const insert = db.prepare('INSERT INTO users (email, password) VALUES (?, ?)');
+        const result = insert.run(email, password);
+        res.json({ success: true, userId: result.lastInsertRowid });
+    } catch (err) {
+        // This triggers if the email is not unique
+        res.status(400).json({ success: false, message: "Email already exists" });
+    }
+});
+
+// update password
+app.post('/account/update-password', (req, res) => {
+    const { userId, currentPassword, newPassword } = req.body;
+    
+    // Step 1: Verify current password
+    const user = db.prepare('SELECT id FROM users WHERE id = ? AND password = ?')
+                   .get(userId, currentPassword);
+    
+    if (!user) {
+        // Current password is wrong
+        return res.status(401).json({ 
+            success: false, 
+            message: "Current password is incorrect" 
+        });
+    }
+    
+    // Step 2: Update to new password
+    db.prepare('UPDATE users SET password = ? WHERE id = ?')
+      .run(newPassword, userId);
+    
+    res.json({ success: true, message: "Password updated successfully" });
 });
 
 // GET the watchlist for a specific user

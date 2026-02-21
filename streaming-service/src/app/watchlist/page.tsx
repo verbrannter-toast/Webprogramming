@@ -57,7 +57,7 @@ export default function Watchlist() {
       <h1 className="text-white text-3xl font-bold mb-8">My List</h1>
       
       {myList.length === 0 ? (
-        <p className="text-gray-500">Your watchlist is currently empty.</p>
+        <p className="text-gray-500">Your watchlist is currently empty</p>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
           {myList.map((movie) => (
