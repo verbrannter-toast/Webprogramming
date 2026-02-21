@@ -117,24 +117,36 @@ export default function Home() {
       <Navbar />
       
       {/* Hero Section */}
-      <div className="relative h-[80vh] w-full">
-        <img src={FEATURED_MOVIE.image} className="w-full h-full object-cover opacity-70" alt="Hero" />
+      <div className="relative min-h-[75vh] w-full flex flex-col justify-center">
+        <img 
+          src={FEATURED_MOVIE.image} 
+          className="absolute inset-0 w-full h-full object-cover opacity-70" 
+          alt="Hero" 
+        />
+        
+        {/* Gradients */}
         <div className="absolute inset-0 bg-linear-to-r from-black via-transparent to-transparent" />
         <div className="absolute bottom-0 w-full h-32 bg-linear-to-t from-[#141414] to-transparent" />
         
-        <div className="absolute top-[35%] left-4 md:left-12 max-w-xl space-y-6">
-          <h1 className="text-5xl md:text-7xl font-bold">{FEATURED_MOVIE.title}</h1>
-          <p className="text-lg text-gray-200">{FEATURED_MOVIE.description}</p>
+        {/* Hero Content */}
+        <div className="relative z-10 px-4 md:px-12 max-w-4xl space-y-4">
+          <h1 className="text-4xl md:text-6xl font-bold leading-tight">
+            {FEATURED_MOVIE.title}
+          </h1>
+          <p className="text-sm md:text-lg text-gray-200 max-w-xl">
+            {FEATURED_MOVIE.description}
+          </p>
           <div className="flex gap-3">
-            <button className="flex items-center gap-2 px-8 py-3 bg-white text-black rounded font-bold hover:bg-opacity-80 transition"><Play fill="black" /> Play</button>
+            <button className="flex items-center gap-2 px-8 py-2 bg-white text-black rounded font-bold hover:bg-opacity-80 transition">
+              <Play fill="black" /> Play
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Movie Rows */}
-      <div className="relative z-10 -mt-32 pb-20">
+      {/* Movie Rows*/}
+      <div className="relative z-10 pb-20">
         <Row title="Trending Now" movies={allMovies} userId={userId} />
-        {/* map through genres and filter movies for each row */}
         {genres.map(genre => (
           <Row 
             key={genre} 
