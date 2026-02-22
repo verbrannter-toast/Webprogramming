@@ -15,7 +15,7 @@ export default function SignoutSection() {
     };
 
      return (
-      <SectionLayout sectionTitle='Sign Out'>
+      <SectionLayout sectionTitle='Sign Out' buttonAtBottom>
         <p className="text-gray-300">Are you sure you want to sign out?</p>
         <ConfirmButton text="Confirm Sign Out" onClick={handleSignOut}/>
       </SectionLayout>

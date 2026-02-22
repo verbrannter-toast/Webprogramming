@@ -11,7 +11,7 @@ function AvatarSection(){
         
     }
     return(
-        <SectionLayout sectionTitle='Change Password'>
+        <SectionLayout sectionTitle='Change Password' buttonAtBottom>
             <h3>1. Choose an avatar</h3>
             {/*drag and drop form*/}
             <h3>2. Prepare your image </h3>

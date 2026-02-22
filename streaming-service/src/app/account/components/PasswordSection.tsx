@@ -52,9 +52,9 @@ function PasswordSection () {
   };
 
     return (
-      <SectionLayout sectionTitle='Change Password'>
+      <SectionLayout sectionTitle='Change Password' buttonAtBottom>
         {alertVar && <AlertContainer type={alertVar.type} message={alertVar.message} />}
-        <form onSubmit={handleUpdatePassword} className="space-y-4 mt-4">
+        <form id="password-form" onSubmit={handleUpdatePassword} className="space-y-4 mt-4">
           <input 
             type="password" 
             placeholder="Current Password" 
@@ -79,8 +79,10 @@ function PasswordSection () {
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
           />
-          <ConfirmButton text="Update Password" type="submit" />
+          
         </form>
+        <ConfirmButton text="Update Password" type="submit" form="password-form" />
+        
       </SectionLayout>
 
     );
