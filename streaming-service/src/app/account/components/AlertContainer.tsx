@@ -1,8 +1,8 @@
 import React from 'react';
 
-type AlertType = 'success' | 'error' | 'warning';
+export type AlertType = 'success' | 'error' | 'warning';
 
-type AlertProps = {
+export type Alert = {
   type: AlertType;
   message: string;
 };
@@ -14,7 +14,7 @@ const alertStyles: Record<AlertType, string> = {
   warning: 'bg-yellow-600 border-yellow-700'
 };
 
-const AlertContainer = ({ type, message }: AlertProps) => {
+const AlertContainer = ({ type, message }: Alert) => {
   return (
     <div className={`w-full p-4 rounded border-2 ${alertStyles[type]} text-white font-medium`}>
       {message}

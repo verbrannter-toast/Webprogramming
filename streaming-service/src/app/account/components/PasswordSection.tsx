@@ -1,9 +1,7 @@
 import React, {useState} from 'react';
 import SectionLayout from './SectionLayout'
 import ConfirmButton from './ConfirmButton'
-import AlertContainer from './AlertContainer';
-
-type AlertType = 'success' | 'error' | 'warning';
+import AlertContainer, { type Alert } from './AlertContainer';
 
 function PasswordSection () { 
   const userId = localStorage.getItem('userId');
@@ -11,7 +9,7 @@ function PasswordSection () {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [alertVar, setAlert] = useState<{ type: AlertType; message: string } | null>(null);
+  const [alertVar, setAlert] = useState<Alert | null>(null);
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,17 +54,20 @@ function PasswordSection () {
     return (
       <SectionLayout sectionTitle='Change Password'>
         {alertVar && <AlertContainer type={alertVar.type} message={alertVar.message} />}
-        <form onSubmit={handleUpdatePassword} className="space-y-4">
+        <form onSubmit={handleUpdatePassword} className="space-y-4 mt-4">
           <input 
             type="password" 
             placeholder="Current Password" 
             className="w-full p-3 rounded bg-zinc-800 text-white outline-none"
+            value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
+            required
           />
           <input 
             type="password" 
             placeholder="New Password" 
             className="w-full p-3 rounded bg-zinc-800 text-white outline-none"
+            value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             required
           />
@@ -74,6 +75,7 @@ function PasswordSection () {
             type="password" 
             placeholder="Confirm New Password" 
             className="w-full p-3 rounded bg-zinc-800 text-white outline-none"
+            value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
           />
@@ -83,6 +85,5 @@ function PasswordSection () {
 
     );
 }
-
 
 export default PasswordSection
