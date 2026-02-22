@@ -1,27 +1,31 @@
 import React, {useState} from 'react';
 import SectionLayout from './SectionLayout'
 import ConfirmButton from './ConfirmButton'
+import AlertContainer from './AlertContainer';
+
+type AlertType = 'success' | 'error' | 'warning';
 
 function PasswordSection () { 
   const userId = localStorage.getItem('userId');
   const userEmail = localStorage.getItem('userEmail');
-    // TO-DO implement handleUpdatePassword
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [alertVar, setAlert] = useState<{ type: AlertType; message: string } | null>(null);
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Clear previous alert
+    setAlert(null);
+
     if (newPassword !== confirmPassword) {
-      alert("passwords don't match");
-      // TO-DO: it should be displayed under the form on the page
+      setAlert({ type: 'error', message: "Passwords don't match" });
       return;
     }
 
     if (newPassword === currentPassword){
-      alert("the new password should differ from the old one");
-      // TO-DO: it should be displayed under the form on the page
+      setAlert({ type: 'warning', message: "The new password should differ from the old one" });
       return;
     }
 
@@ -35,16 +39,14 @@ function PasswordSection () {
       const data = await res.json();
       
       if (data.success) {
-        alert("Password was changed successfully");
-        // TO-DO: it should displayed under the form on the page
-        
-        // Optionally clear the form
+        setAlert({type: 'success', message: "Password was changed successfully"})
+    
+        // Clear the form
         setCurrentPassword('');
         setNewPassword('');
         setConfirmPassword('');
       } else {
-        alert(data.message || "Current password is incorrect");
-        // TO-DO: it should displayed under the form on the page
+        setAlert({type: 'error', message: data.message || "Current password is incorrect"})
       }
     } catch (err) {
       alert("Backend server not reached.");
@@ -53,6 +55,7 @@ function PasswordSection () {
 
     return (
       <SectionLayout sectionTitle='Change Password'>
+        {alertVar && <AlertContainer type={alertVar.type} message={alertVar.message} />}
         <form onSubmit={handleUpdatePassword} className="space-y-4">
           <input 
             type="password" 
