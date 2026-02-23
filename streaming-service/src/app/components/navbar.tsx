@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Search, ChevronDown } from 'lucide-react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import UserAvatar from './UserAvatar';
 import { GENRE_CONFIGS } from '../genres/config';
 
@@ -12,9 +12,13 @@ const API_URL = 'http://localhost:5000';
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const fetchAvatar = () => {
     const userId = localStorage.getItem('userId');
@@ -65,6 +69,69 @@ export const Navbar = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (pathname !== '/search') {
+      setSearchQuery('');
+      setIsSearchOpen(false);
+      return;
+    }
+
+    const urlQuery = searchParams.get('q') ?? '';
+    setSearchQuery(urlQuery);
+
+    if (urlQuery) {
+      setIsSearchOpen(true);
+    }
+  }, [pathname, searchParams]);
+
+  useEffect(() => {
+    if (!isSearchOpen) {
+      return;
+    }
+
+    searchInputRef.current?.focus();
+  }, [isSearchOpen]);
+
+  useEffect(() => {
+    if (!isSearchOpen) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      const trimmedQuery = searchQuery.trim();
+
+      if (!trimmedQuery) {
+        if (pathname === '/search') {
+          router.push('/');
+        }
+        return;
+      }
+
+      const currentQuery = searchParams.get('q') ?? '';
+
+      if (pathname !== '/search' || currentQuery !== trimmedQuery) {
+        router.push(`/search?q=${encodeURIComponent(trimmedQuery)}`);
+      }
+    }, 300);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [isSearchOpen, pathname, router, searchParams, searchQuery]);
+
+  const handleOpenSearch = () => {
+    setIsSearchOpen(true);
+  };
+
+  const handleCloseSearch = () => {
+    setIsSearchOpen(false);
+    setSearchQuery('');
+
+    if (pathname === '/search') {
+      router.push('/');
+    }
+  };
+
   const handleSignInOut = () => {
     // 1. Remove user from storage
     localStorage.removeItem('userId');
@@ -103,7 +170,37 @@ export const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-6 text-white relative">
-          <Search className="w-5 h-5 cursor-pointer" />
+          <div className="flex items-center">
+            {!isSearchOpen ? (
+              <button
+                type="button"
+                onClick={handleOpenSearch}
+                className="w-5 h-5 cursor-pointer"
+                aria-label="Open search"
+              >
+                <Search className="w-5 h-5" />
+              </button>
+            ) : (
+              <div className="flex items-center border border-zinc-500 bg-black/80 px-2 md:px-3 py-1.5 w-44 md:w-64 transition-all duration-300">
+                <button
+                  type="button"
+                  onClick={handleCloseSearch}
+                  className="text-zinc-300 hover:text-white transition"
+                  aria-label="Close search"
+                >
+                  <Search className="w-4 h-4 md:w-5 md:h-5" />
+                </button>
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Titles"
+                  className="ml-2 w-full bg-transparent text-sm text-white placeholder-zinc-400 outline-none"
+                />
+              </div>
+            )}
+          </div>
           
           {/* Profile Group */}
           <div className="relative">

@@ -2,14 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Check } from 'lucide-react';
-
-interface Movie {
-  id: number;
-  title: string;
-  image: string;
-  genre: string;
-}
+import MovieGridSection from '../components/movies/MovieGridSection';
+import MovieActionCard from '../components/movies/MovieActionCard';
+import type { MovieCardItem } from '../components/movies/types';
 
 interface GenreMoviesPageProps {
   genre: string;
@@ -29,7 +24,7 @@ export default function GenreMoviesPage({
   apiBaseUrl = DEFAULT_API_URL
 }: GenreMoviesPageProps) {
   const [userId, setUserId] = useState<string | null>(null);
-  const [movies, setMovies] = useState<Movie[]>([]);
+  const [movies, setMovies] = useState<MovieCardItem[]>([]);
   const [watchlistIds, setWatchlistIds] = useState<number[]>([]);
   const router = useRouter();
 
@@ -42,7 +37,7 @@ export default function GenreMoviesPage({
     fetch(`${apiBaseUrl}/movies`)
       .then((res) => res.json())
       .then((data) => {
-        const filtered = data.filter((movie: Movie) => movie.genre === genre);
+        const filtered = data.filter((movie: MovieCardItem) => movie.genre === genre);
         setMovies(filtered);
       });
   }, [apiBaseUrl, genre]);
@@ -76,35 +71,21 @@ export default function GenreMoviesPage({
   };
 
   return (
-    <div className="bg-[#141414] min-h-screen pt-24 px-4 md:px-24" data-genre-slug={slug}>
-      <h1 className="text-white text-3xl font-bold mb-8">{heading ?? `${genre} Movies`}</h1>
-
-      {movies.length === 0 ? (
-        <p className="text-zinc-400">{emptyStateText}</p>
-      ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-          {movies.map((movie) => {
-            const isAdded = watchlistIds.includes(movie.id);
-
-            return (
-              <div key={movie.id} className="group relative aspect-auto bg-zinc-800 rounded-md overflow-hidden hover:scale-105 transition duration-300">
-                <img src={movie.image} alt={movie.title} className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => toggleWatchlist(movie.id)}
-                      className="p-2 bg-white rounded-full text-black hover:bg-gray-200 transition"
-                    >
-                      {isAdded ? <Check size={16} /> : <Plus size={16} />}
-                    </button>
-                    <p className="text-white text-xs font-bold truncate">{movie.title}</p>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+    <div data-genre-slug={slug}>
+      <MovieGridSection
+        heading={heading ?? `${genre} Movies`}
+        movies={movies}
+        emptyStateText={emptyStateText}
+        renderMovieCard={(movie) => (
+          <MovieActionCard
+            key={movie.id}
+            movie={movie}
+            variant="toggle"
+            isActive={watchlistIds.includes(movie.id)}
+            onAction={toggleWatchlist}
+          />
+        )}
+      />
     </div>
   );
 }

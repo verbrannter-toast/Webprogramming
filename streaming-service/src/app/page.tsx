@@ -1,10 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Play, Info, Bell, Search, ChevronDown, User, Plus, Check } from 'lucide-react';
+import { Play, Plus, Check } from 'lucide-react';
 import Link from 'next/link';
-
-import { Navbar } from './components/navbar';
 
 // --- Types & Config ---
 interface Movie {
@@ -131,8 +129,6 @@ export default function Home() {
 
   return (
     <div className="bg-[#141414] min-h-screen text-white overflow-x-hidden">
-      <Navbar />
-      
       {/* Hero Section */}
       <div className="relative min-h-[75vh] w-full flex flex-col justify-center">
         <img 
