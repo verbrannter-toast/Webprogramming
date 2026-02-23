@@ -27,6 +27,7 @@
   - `POST /watchlist/toggle` -> `{ status: 'added' | 'removed' }`
   - `POST /account/update-password` -> `{ success, message }`
   - `GET /account/avatar/:userId`, `POST /account/avatar` -> `{ success, avatarUrl }`
+  - `DELETE /account/:userId` -> `{ success, message }` and removes watchlist + avatar file
 
 ## Project patterns to preserve
 - Auth state is localStorage-first (`userId`, `userEmail`), e.g. login/account/navbar flows.
@@ -41,4 +42,5 @@
 - Prefer minimal targeted edits near existing feature files instead of introducing new abstraction layers.
 - Keep existing style: functional React components, hooks, inline interfaces, Tailwind utility classes.
 - If adding genres/categories, use exact genre strings present in `backend/movies.json`.
+- API host usage is currently mixed (`localhost` and `127.0.0.1` in frontend); avoid spreading this inconsistency in new changes.
 - `userEmail` is displayed in account UI and currently set during login/register; preserve this when touching auth flows.
