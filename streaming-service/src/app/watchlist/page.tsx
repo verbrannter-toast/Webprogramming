@@ -1,21 +1,16 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Trash2 } from 'lucide-react';
-
-interface Movie {
-  id: number;
-  title: string;
-  image: string;
-  [key: string]: any;
-}
+import MovieGridSection from '../components/movies/MovieGridSection';
+import MovieActionCard from '../components/movies/MovieActionCard';
+import type { MovieCardItem } from '../components/movies/types';
 
 const API_URL = 'http://localhost:5000';
 
 export default function Watchlist() {
   const [userId, setUserId] = useState<string | null>(null);
-  const [myList, setMyList] = useState<Movie[]>([]);
-  const [allMovies, setAllMovies] = useState<Movie[]>([]);
+  const [myList, setMyList] = useState<MovieCardItem[]>([]);
+  const [allMovies, setAllMovies] = useState<MovieCardItem[]>([]);
 
   // fetch the full movie library on mount
   useEffect(() => {
@@ -53,28 +48,19 @@ export default function Watchlist() {
   };
 
   return (
-    <div className="bg-[#141414] min-h-screen pt-24 px-4 md:px-12">
-      <h1 className="text-white text-3xl font-bold mb-8">My List</h1>
-      
-      {myList.length === 0 ? (
-        <p className="text-gray-500">Your watchlist is currently empty</p>
-      ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-          {myList.map((movie) => (
-            <div key={movie.id} className="group relative aspect-auto bg-zinc-800 rounded-md overflow-hidden hover:scale-105 transition duration-300">
-              <img src={movie.image} alt={movie.title} className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <button 
-                  onClick={() => removeFromWatchlist(movie.id)}
-                  className="flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded text-sm font-bold hover:bg-red-700"
-                >
-                  <Trash2 size={16} /> Remove
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+    <MovieGridSection
+      heading="My List"
+      movies={myList}
+      emptyStateText="Your watchlist is currently empty"
+      horizontalPaddingClassName="px-4 md:px-12"
+      renderMovieCard={(movie) => (
+        <MovieActionCard
+          key={movie.id}
+          movie={movie}
+          variant="remove"
+          onAction={removeFromWatchlist}
+        />
       )}
-    </div>
+    />
   );
 }
