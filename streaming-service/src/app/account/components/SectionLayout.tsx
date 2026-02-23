@@ -5,14 +5,14 @@ export default function SectionLayout({
   children,
   buttonAtBottom = false
 }: {
-  sectionTitle: string; 
+  sectionTitle?: string; 
   children: React.ReactNode
   buttonAtBottom?: boolean;
 }) {
   return (
     <div className="space-y-6">
-      <h3 className="text-3xl font-bold mb-8">{sectionTitle}</h3>
-      <div className={`bg-zinc-900 p-6 rounded-lg ${buttonAtBottom ? 'flex flex-col min-h-[calc(100vh-12rem)]' : 'space-y-4'
+      {/* <h3 className="text-3xl font-bold mb-8">{sectionTitle}</h3> */}
+      <div className={`bg-zinc-900 p-5 rounded-lg ${buttonAtBottom ? 'flex flex-col min-h-[calc(100vh-8rem)]' : 'space-y-4'
       }`}>
 
         { buttonAtBottom ? (

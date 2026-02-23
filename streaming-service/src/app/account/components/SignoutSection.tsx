@@ -16,7 +16,9 @@ export default function SignoutSection() {
 
      return (
       <SectionLayout sectionTitle='Sign Out' buttonAtBottom>
-        <p className="text-gray-300">Are you sure you want to sign out?</p>
+        <div className='flex justify-center items-cente mb-20 mt-15'>
+          <p className="text-gray-300 text-[24px]">Are you sure you want to sign out?</p>
+        </div>
         <ConfirmButton text="Confirm Sign Out" onClick={handleSignOut}/>
       </SectionLayout>
       );
