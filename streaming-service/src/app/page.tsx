@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Play, Plus, Check } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Play, Plus, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
 // --- Types & Config ---
@@ -10,6 +10,10 @@ interface Movie {
   genre: string;
   title: string;
   image: string;
+}
+
+interface WatchHistoryMovie extends Movie {
+  progressPercent: number;
 }
 
 const API_URL = 'http://localhost:5000';
@@ -22,53 +26,120 @@ const FEATURED_MOVIE = {
 
 // --- Sub-Components ---
 
-const Row = ({ title, movies, userId }: { title: string; movies: Movie[]; userId: string | null }) => {
-  const [watchlist, setWatchlist] = useState<number[]>([]);
+const Row = ({
+  title,
+  movies,
+  userId,
+  watchlistIds,
+  onToggleWatchlist,
+  showProgress = false,
+  progressByMovieId = {},
+  emptyMessage
+}: {
+  title: string;
+  movies: Movie[];
+  userId: string | null;
+  watchlistIds: number[];
+  onToggleWatchlist: (event: React.MouseEvent<HTMLButtonElement>, movieId: number) => void;
+  showProgress?: boolean;
+  progressByMovieId?: Record<number, number>;
+  emptyMessage?: string;
+}) => {
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [startIndex, setStartIndex] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(1);
+  const [itemSpan, setItemSpan] = useState(0);
 
-  // Fetch user's current watchlist IDs
   useEffect(() => {
-    if (!userId) return;
-    fetch(`${API_URL}/watchlist/${userId}`)
-      .then(res => res.json())
-      .then(data => setWatchlist(data.map(Number)))
-      .catch(err => console.error("API Error:", err));
-  }, [userId]);
+    setStartIndex(0);
+  }, [movies.length, title]);
 
-  const toggleWatchlist = async (e: React.MouseEvent, movieId: number) => {
-    e.preventDefault(); // Prevents the Link from triggering
-    e.stopPropagation(); // Stops the click event from bubbling up to the Link
-    
-    if (!userId) return alert("Please login to use the watchlist!");
-    
-    try {
-      const response = await fetch(`${API_URL}/watchlist/toggle`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: userId, movieId })
-      });
-      const data = await response.json();
-      
-      setWatchlist(prev => 
-        data.status === 'added' ? [...prev, movieId] : prev.filter(id => id !== movieId)
-      );
-    } catch (err) {
-      alert("Error connecting to backend server.");
+  useEffect(() => {
+    const viewportElement = viewportRef.current;
+    const trackElement = trackRef.current;
+
+    if (!viewportElement || !trackElement || movies.length === 0) {
+      return;
     }
+
+    const measure = () => {
+      const firstCard = trackElement.querySelector('[data-row-card="true"]') as HTMLElement | null;
+      if (!firstCard) {
+        return;
+      }
+
+      const computedStyle = window.getComputedStyle(trackElement);
+      const gap = Number.parseFloat(computedStyle.columnGap || computedStyle.gap || '16') || 16;
+      const cardWidth = firstCard.getBoundingClientRect().width;
+      const peekWidth = Math.min(cardWidth / 2, 120);
+      const fitCount = Math.max(1, Math.floor((viewportElement.clientWidth - peekWidth + gap) / (cardWidth + gap)));
+
+      setVisibleCount(fitCount);
+      setItemSpan(cardWidth + gap);
+
+      setStartIndex((previousStart) => {
+        if (previousStart >= movies.length) {
+          return 0;
+        }
+        return previousStart;
+      });
+    };
+
+    measure();
+
+    const observer = new ResizeObserver(() => {
+      measure();
+    });
+
+    observer.observe(viewportElement);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [movies.length]);
+
+  const canGoLeft = startIndex > 0;
+  const canGoRight = startIndex + visibleCount < movies.length;
+  const translateX = -(startIndex * itemSpan);
+
+  const goNext = () => {
+    setStartIndex((previousStart) => {
+      const nextStart = previousStart + visibleCount;
+      if (nextStart >= movies.length) {
+        return previousStart;
+      }
+      return nextStart;
+    });
+  };
+
+  const goPrevious = () => {
+    setStartIndex((previousStart) => Math.max(0, previousStart - visibleCount));
   };
 
   return (
     <div className="px-4 md:px-12 py-4 space-y-2">
       <h2 className="text-xl md:text-2xl font-semibold text-gray-100">{title}</h2>
-      
-      <div className="flex gap-4 overflow-x-auto py-4 items-start scrollbar-hide">
+
+      {movies.length === 0 ? (
+        <p className="text-zinc-400 py-4">{emptyMessage ?? 'No movies to display.'}</p>
+      ) : (
+        <div ref={viewportRef} className="relative overflow-hidden py-4">
+          <div
+            ref={trackRef}
+            className="flex gap-4 items-start transition-transform duration-500 ease-out will-change-transform"
+            style={{ transform: `translateX(${translateX}px)` }}
+          >
         {movies.map((movie) => {
-          const isAdded = watchlist.includes(movie.id);
+          const isAdded = watchlistIds.includes(movie.id);
+          const progressPercent = progressByMovieId[movie.id] ?? 0;
           
           return (
             /* wrappping whole card in a link to the watch page */
             <Link 
               key={movie.id} 
               href={`/watch/${movie.id}`}
+              data-row-card="true"
               className="group relative shrink-0 w-40 h-75 md:w-70 md:h-105 bg-zinc-800 rounded-md overflow-hidden hover:scale-105 transition duration-300 shadow-xl cursor-pointer"
             >
               <img
@@ -82,7 +153,7 @@ const Row = ({ title, movies, userId }: { title: string; movies: Movie[]; userId
                 <div className="flex items-center gap-3">
                   {/* Toggle Button with stopPropagation */}
                   <button 
-                    onClick={(e) => toggleWatchlist(e, movie.id)}
+                    onClick={(e) => onToggleWatchlist(e, movie.id)}
                     className="p-2 bg-white rounded-full text-black hover:bg-gray-200 transition-all active:scale-90 cursor-pointer"
                   >
                     {isAdded ? <Check size={18} /> : <Plus size={18} />}
@@ -96,11 +167,42 @@ const Row = ({ title, movies, userId }: { title: string; movies: Movie[]; userId
                   </div>
                 </div>
               </div>
+
+              {showProgress && (
+                <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-black/50">
+                  <div
+                    className="h-full bg-red-600"
+                    style={{ width: `${Math.max(3, Math.min(progressPercent, 100))}%` }}
+                  />
+                </div>
+              )}
             </Link>
           );
         })}
+          </div>
+
+          {canGoLeft && (
+            <button
+              onClick={goPrevious}
+              className="absolute left-0 top-0 bottom-0 w-14 md:w-20 flex items-center justify-center bg-black/45 hover:bg-black/75 transition cursor-pointer"
+              aria-label={`Scroll ${title} left`}
+            >
+              <ChevronLeft size={30} className="text-white" />
+            </button>
+          )}
+
+          {canGoRight && (
+            <button
+              onClick={goNext}
+              className="absolute right-0 top-0 bottom-0 w-14 md:w-20 flex items-center justify-center bg-black/45 hover:bg-black/75 transition cursor-pointer"
+              aria-label={`Scroll ${title} right`}
+            >
+              <ChevronRight size={30} className="text-white" />
+            </button>
+          )}
+        </div>
+      )}
       </div>
-    </div>
   );
 };
 
@@ -109,7 +211,8 @@ const Row = ({ title, movies, userId }: { title: string; movies: Movie[]; userId
 export default function Home() {
   const [userId, setUserId] = useState<string | null>(null);
   const [allMovies, setAllMovies] = useState<Movie[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [watchlistIds, setWatchlistIds] = useState<number[]>([]);
+  const [continueWatching, setContinueWatching] = useState<WatchHistoryMovie[]>([]);
 
   useEffect(() => {
     // get user
@@ -121,11 +224,88 @@ export default function Home() {
       .then(res => res.json())
       .then(data => {
         setAllMovies(data);
-        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to fetch movies', err);
       });
   }, []);
 
+  useEffect(() => {
+    if (!userId) {
+      setWatchlistIds([]);
+      setContinueWatching([]);
+      return;
+    }
+
+    fetch(`${API_URL}/watchlist/${userId}`)
+      .then(res => res.json())
+      .then(data => setWatchlistIds(data.map(Number)))
+      .catch(err => console.error('Failed to fetch watchlist', err));
+
+    fetch(`${API_URL}/history/${userId}`)
+      .then(res => res.json())
+      .then(data => {
+        const mappedMovies = data.map((item: WatchHistoryMovie) => ({
+          id: item.id,
+          genre: item.genre,
+          title: item.title,
+          image: item.image,
+          progressPercent: item.progressPercent
+        }));
+        setContinueWatching(mappedMovies);
+      })
+      .catch(err => console.error('Failed to fetch watch history', err));
+  }, [userId]);
+
+  const toggleWatchlist = async (event: React.MouseEvent<HTMLButtonElement>, movieId: number) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!userId) {
+      alert('Please login to use the watchlist!');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/watchlist/toggle`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, movieId })
+      });
+
+      const data = await response.json();
+      setWatchlistIds((previousIds) => (
+        data.status === 'added'
+          ? [...previousIds, movieId]
+          : previousIds.filter((id) => id !== movieId)
+      ));
+    } catch (error) {
+      console.error('Error connecting to backend server.', error);
+      alert('Error connecting to backend server.');
+    }
+  };
+
   const genres = Array.from(new Set(allMovies.map(m => m.genre)));
+
+  const continueWatchingMovies = useMemo<Movie[]>(
+    () => continueWatching.map((item) => ({
+      id: item.id,
+      genre: item.genre,
+      title: item.title,
+      image: item.image
+    })),
+    [continueWatching]
+  );
+
+  const continueProgressByMovieId = useMemo<Record<number, number>>(
+    () => continueWatching.reduce<Record<number, number>>((accumulator, item) => {
+      accumulator[item.id] = item.progressPercent;
+      return accumulator;
+    }, {}),
+    [continueWatching]
+  );
+
+  const featuredMovieId = allMovies.find((movie) => movie.title === FEATURED_MOVIE.title)?.id ?? allMovies[0]?.id ?? 101;
 
   return (
     <div className="bg-[#141414] min-h-screen text-white overflow-x-hidden">
@@ -150,7 +330,7 @@ export default function Home() {
             {FEATURED_MOVIE.description}
           </p>
           <div className="flex gap-3">
-            <Link href="/watch/1" className="flex-1 md:flex-none">
+            <Link href={`/watch/${featuredMovieId}`} className="flex-1 md:flex-none">
               <button className="flex items-center justify-center gap-2 px-8 py-3 bg-white text-black rounded font-bold hover:bg-opacity-80 transition w-full cursor-pointer">
                 <Play fill="black" /> Play
               </button>
@@ -161,13 +341,34 @@ export default function Home() {
 
       {/* Movie Rows*/}
       <div className="relative z-10 pb-20">
-        <Row title="Trending Now" movies={allMovies} userId={userId} />
+        {continueWatchingMovies.length > 0 && (
+          <Row
+            title="Continue Watching"
+            movies={continueWatchingMovies}
+            userId={userId}
+            watchlistIds={watchlistIds}
+            onToggleWatchlist={toggleWatchlist}
+            showProgress
+            progressByMovieId={continueProgressByMovieId}
+          />
+        )}
+
+        <Row
+          title="Trending Now"
+          movies={allMovies}
+          userId={userId}
+          watchlistIds={watchlistIds}
+          onToggleWatchlist={toggleWatchlist}
+        />
+
         {genres.map(genre => (
           <Row 
             key={genre} 
             title={genre} 
             movies={allMovies.filter(m => m.genre === genre)} 
-            userId={userId} 
+            userId={userId}
+            watchlistIds={watchlistIds}
+            onToggleWatchlist={toggleWatchlist}
           />
         ))}
       </div>
