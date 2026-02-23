@@ -3,19 +3,28 @@ import cors from 'cors';
 import Database from 'better-sqlite3';
 import fs from 'fs';
 import path from 'path';
+import { randomUUID } from 'crypto';
 
 const app = express();
 const db = new Database('database.db');
+const AVATAR_MAX_SIZE_BYTES = 5 * 1024 * 1024;
+const AVATAR_UPLOAD_DIR = path.resolve(process.cwd(), '..', 'user-uploads', 'avatars');
+
+if (!fs.existsSync(AVATAR_UPLOAD_DIR)) {
+    fs.mkdirSync(AVATAR_UPLOAD_DIR, { recursive: true });
+}
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '8mb' }));
+app.use('/uploads/avatars', express.static(AVATAR_UPLOAD_DIR));
 
 // initialize Tables
 db.exec(`
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT, 
         email TEXT UNIQUE, 
-        password TEXT
+        password TEXT,
+        avatar_path TEXT
     );
     CREATE TABLE IF NOT EXISTS watchlists (
         user_id INTEGER, 
@@ -89,6 +98,101 @@ app.post('/account/update-password', (req, res) => {
       .run(newPassword, userId);
     
     res.json({ success: true, message: "Password updated successfully" });
+});
+
+app.get('/account/avatar/:userId', (req, res) => {
+    const { userId } = req.params;
+
+    const user = db.prepare('SELECT avatar_path FROM users WHERE id = ?').get(userId) as { avatar_path?: string } | undefined;
+
+    if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (!user.avatar_path) {
+        return res.json({ success: true, avatarUrl: null });
+    }
+
+    const avatarUrl = `http://localhost:5000/uploads/avatars/${user.avatar_path}`;
+    res.json({ success: true, avatarUrl });
+});
+
+app.post('/account/avatar', (req, res) => {
+    const { userId, imageData } = req.body as { userId?: string | number; imageData?: string };
+
+    if (!userId || !imageData) {
+        return res.status(400).json({ success: false, message: 'userId and imageData are required' });
+    }
+
+    const user = db.prepare('SELECT id, avatar_path FROM users WHERE id = ?').get(userId) as { id: number; avatar_path?: string } | undefined;
+
+    if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const imageMatch = imageData.match(/^data:(image\/(?:png|jpeg|webp));base64,(.+)$/);
+
+    if (!imageMatch) {
+        return res.status(400).json({ success: false, message: 'Only png, jpg/jpeg, and webp images are supported' });
+    }
+
+    const mimeType = imageMatch[1];
+    const base64Payload = imageMatch[2];
+    const avatarBuffer = Buffer.from(base64Payload, 'base64');
+
+    if (avatarBuffer.length > AVATAR_MAX_SIZE_BYTES) {
+        return res.status(400).json({ success: false, message: 'Image must be 5MB or smaller' });
+    }
+
+    const extension = mimeType === 'image/png'
+        ? 'png'
+        : mimeType === 'image/webp'
+            ? 'webp'
+            : 'jpg';
+
+    const fileName = `user-${userId}-${randomUUID()}.${extension}`;
+    const targetPath = path.join(AVATAR_UPLOAD_DIR, fileName);
+
+    fs.writeFileSync(targetPath, avatarBuffer);
+
+    if (user.avatar_path) {
+        const previousPath = path.join(AVATAR_UPLOAD_DIR, user.avatar_path);
+        if (fs.existsSync(previousPath)) {
+            fs.unlinkSync(previousPath);
+        }
+    }
+
+    db.prepare('UPDATE users SET avatar_path = ? WHERE id = ?').run(fileName, userId);
+
+    const avatarUrl = `http://localhost:5000/uploads/avatars/${fileName}`;
+    res.json({ success: true, avatarUrl });
+});
+
+// delete account
+app.delete('/account/:userId', (req, res) => {
+    const { userId } = req.params;
+
+    const user = db.prepare('SELECT id, avatar_path FROM users WHERE id = ?').get(userId) as { id: number; avatar_path?: string } | undefined;
+
+    if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Delete avatar file from disk if it exists
+    if (user.avatar_path) {
+        const avatarFilePath = path.join(AVATAR_UPLOAD_DIR, user.avatar_path);
+        if (fs.existsSync(avatarFilePath)) {
+            fs.unlinkSync(avatarFilePath);
+        }
+    }
+
+    // Delete watchlist entries
+    db.prepare('DELETE FROM watchlists WHERE user_id = ?').run(userId);
+
+    // Delete user
+    db.prepare('DELETE FROM users WHERE id = ?').run(userId);
+
+    res.json({ success: true, message: 'Account deleted successfully' });
 });
 
 // GET the watchlist for a specific user

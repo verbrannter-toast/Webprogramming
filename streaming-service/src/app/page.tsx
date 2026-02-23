@@ -119,7 +119,7 @@ export default function Home() {
     if (savedId) setUserId(savedId);
 
     // fetch movies from backend
-    fetch('http://127.0.0.1:5000/movies')
+    fetch('http://localhost:5000/movies')
       .then(res => res.json())
       .then(data => {
         setAllMovies(data);

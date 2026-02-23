@@ -12,7 +12,27 @@ const API_URL = 'http://localhost:5000';
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const router = useRouter();
+  const pathname = usePathname();
+
+  const fetchAvatar = () => {
+    const userId = localStorage.getItem('userId');
+
+    if (!userId) {
+      setAvatarUrl(null);
+      return;
+    }
+
+    fetch(`${API_URL}/account/avatar/${userId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setAvatarUrl(data.avatarUrl || null);
+      })
+      .catch(() => {
+        setAvatarUrl(null);
+      });
+  };
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 0);
@@ -20,10 +40,36 @@ export const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Re-fetch on every route change so navigating after login always loads the avatar.
+  useEffect(() => {
+    fetchAvatar();
+  }, [pathname]);
+
+  useEffect(() => {
+    const handleAvatarUpdate = (event: Event) => {
+      const customEvent = event as CustomEvent<{ avatarUrl?: string | null }>;
+      const nextAvatarUrl = customEvent.detail?.avatarUrl;
+
+      if (typeof nextAvatarUrl === 'string' || nextAvatarUrl === null) {
+        setAvatarUrl(nextAvatarUrl);
+        return;
+      }
+
+      fetchAvatar();
+    };
+
+    window.addEventListener('avatar-updated', handleAvatarUpdate);
+
+    return () => {
+      window.removeEventListener('avatar-updated', handleAvatarUpdate);
+    };
+  }, []);
+
   const handleSignInOut = () => {
     // 1. Remove user from storage
     localStorage.removeItem('userId');
     localStorage.removeItem('userEmail');
+    setAvatarUrl(null);
     // 2. Close dropdown
     setShowDropdown(false);
     // 3. Redirect to login
@@ -65,9 +111,11 @@ export const Navbar = () => {
               className="flex items-center gap-2 cursor-pointer group"
               onClick={() => setShowDropdown(!showDropdown)}
             >
-              <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
-                <User className="w-5 h-5" />
-              </div>
+              <UserAvatar
+                avatarUrl={avatarUrl}
+                sizeClass='w-8 h-8'
+                className='border-zinc-500'
+              />
               <ChevronDown className={`w-4 h-4 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
             </div>
 

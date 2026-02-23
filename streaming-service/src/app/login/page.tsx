@@ -16,7 +16,7 @@ export default function LoginPage() {
     const endpoint = isRegistering ? '/register' : '/login';
 
     try {
-      const res = await fetch(`http://127.0.0.1:5000${endpoint}`, {
+      const res = await fetch(`http://localhost:5000${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -27,6 +27,7 @@ export default function LoginPage() {
       if (res.ok && (data.success || data.userId)) {
         const id = data.user?.id || data.userId;
         localStorage.setItem('userId', id.toString());
+        localStorage.setItem('userEmail', email);
         router.push('/');
       } else {
         alert(data.message || "Authentication failed!");
