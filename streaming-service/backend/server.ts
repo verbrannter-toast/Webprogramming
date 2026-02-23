@@ -168,6 +168,33 @@ app.post('/account/avatar', (req, res) => {
     res.json({ success: true, avatarUrl });
 });
 
+// delete account
+app.delete('/account/:userId', (req, res) => {
+    const { userId } = req.params;
+
+    const user = db.prepare('SELECT id, avatar_path FROM users WHERE id = ?').get(userId) as { id: number; avatar_path?: string } | undefined;
+
+    if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Delete avatar file from disk if it exists
+    if (user.avatar_path) {
+        const avatarFilePath = path.join(AVATAR_UPLOAD_DIR, user.avatar_path);
+        if (fs.existsSync(avatarFilePath)) {
+            fs.unlinkSync(avatarFilePath);
+        }
+    }
+
+    // Delete watchlist entries
+    db.prepare('DELETE FROM watchlists WHERE user_id = ?').run(userId);
+
+    // Delete user
+    db.prepare('DELETE FROM users WHERE id = ?').run(userId);
+
+    res.json({ success: true, message: 'Account deleted successfully' });
+});
+
 // GET the watchlist for a specific user
 app.get('/watchlist/:userId', (req, res) => {
     const { userId } = req.params;

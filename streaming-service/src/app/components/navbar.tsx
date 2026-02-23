@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Search, ChevronDown } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import UserAvatar from './UserAvatar';
 
 const API_URL = 'http://localhost:5000';
@@ -13,6 +13,7 @@ export const Navbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const router = useRouter();
+  const pathname = usePathname();
 
   const fetchAvatar = () => {
     const userId = localStorage.getItem('userId');
@@ -38,9 +39,12 @@ export const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Re-fetch on every route change so navigating after login always loads the avatar.
   useEffect(() => {
     fetchAvatar();
+  }, [pathname]);
 
+  useEffect(() => {
     const handleAvatarUpdate = (event: Event) => {
       const customEvent = event as CustomEvent<{ avatarUrl?: string | null }>;
       const nextAvatarUrl = customEvent.detail?.avatarUrl;

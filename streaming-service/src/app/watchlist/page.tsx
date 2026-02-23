@@ -19,7 +19,7 @@ export default function Watchlist() {
 
   // fetch the full movie library on mount
   useEffect(() => {
-    fetch('http://127.0.0.1:5000/movies')
+    fetch('http://localhost:5000/movies')
       .then(res => res.json())
       .then(data => setAllMovies(data))
       .catch(err => console.error("Failed to load movie library", err));

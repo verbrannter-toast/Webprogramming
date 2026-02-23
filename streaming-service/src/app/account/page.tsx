@@ -8,6 +8,7 @@ import AvatarSection from './components/AvatarSection';
 import PasswordSection from './components/PasswordSection';
 import SignoutSection from './components/SignoutSection';
 import UserAvatar from '../components/UserAvatar';
+import DeleteAccountSection from './components/DeleteAccountSection';
 
 const API_URL = 'http://localhost:5000';
 
@@ -64,6 +65,12 @@ const API_URL = 'http://localhost:5000';
               setActiveTab={setActiveTab}
             />
             <SidebarButton
+              buttonText='Delete Account'
+              tabValue='delete'
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+            />
+            <SidebarButton
               buttonText='Sign Out'
               tabValue='signout'
               activeTab={activeTab}
@@ -77,6 +84,7 @@ const API_URL = 'http://localhost:5000';
           {activeTab === 'about' && <AboutSection />}
           {activeTab === 'avatar' && <AvatarSection onAvatarUpdated={setAvatarUrl} />}
           {activeTab === 'password' && <PasswordSection />}
+          {activeTab === 'delete' && <DeleteAccountSection />}
           {activeTab === 'signout' && <SignoutSection />}
         </div>
       </div>
