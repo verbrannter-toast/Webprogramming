@@ -30,6 +30,15 @@ db.exec(`
         user_id INTEGER, 
         movie_id INTEGER
     );
+    CREATE TABLE IF NOT EXISTS watch_history (
+        user_id INTEGER NOT NULL,
+        movie_id INTEGER NOT NULL,
+        progress_seconds REAL NOT NULL DEFAULT 0,
+        duration_seconds REAL,
+        is_finished INTEGER NOT NULL DEFAULT 0,
+        last_watched_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (user_id, movie_id)
+    );
     CREATE TABLE IF NOT EXISTS movies (
         id INTEGER PRIMARY KEY,
         title TEXT,
@@ -189,6 +198,9 @@ app.delete('/account/:userId', (req, res) => {
     // Delete watchlist entries
     db.prepare('DELETE FROM watchlists WHERE user_id = ?').run(userId);
 
+    // Delete watch history entries
+    db.prepare('DELETE FROM watch_history WHERE user_id = ?').run(userId);
+
     // Delete user
     db.prepare('DELETE FROM users WHERE id = ?').run(userId);
 
@@ -227,6 +239,124 @@ app.post('/watchlist/toggle', (req, res) => {
         db.prepare('INSERT INTO watchlists (user_id, movie_id) VALUES (?, ?)').run(userId, movieId);
         res.json({ status: 'added' });
     }
+});
+
+app.get('/history/:userId', (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        const rows = db.prepare(`
+            SELECT
+                m.id,
+                m.title,
+                m.genre,
+                m.image,
+                h.progress_seconds AS progressSeconds,
+                h.duration_seconds AS durationSeconds,
+                h.is_finished AS isFinished,
+                h.last_watched_at AS lastWatchedAt
+            FROM watch_history h
+            INNER JOIN movies m ON m.id = h.movie_id
+            WHERE h.user_id = ?
+            ORDER BY h.is_finished ASC, datetime(h.last_watched_at) DESC
+        `).all(userId) as Array<{
+            id: number;
+            title: string;
+            genre: string;
+            image: string;
+            progressSeconds: number;
+            durationSeconds: number | null;
+            isFinished: number;
+            lastWatchedAt: string;
+        }>;
+
+        const payload = rows.map((row) => {
+            const duration = row.durationSeconds ?? 0;
+            const progressPercent = duration > 0
+                ? Math.min(100, Math.round((row.progressSeconds / duration) * 100))
+                : 0;
+
+            return {
+                ...row,
+                progressPercent
+            };
+        });
+
+        res.json(payload);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Failed to fetch watch history' });
+    }
+});
+
+app.post('/history/progress', (req, res) => {
+    const {
+        userId,
+        movieId,
+        progressSeconds,
+        durationSeconds,
+        isFinished
+    } = req.body as {
+        userId?: string | number;
+        movieId?: string | number;
+        progressSeconds?: number;
+        durationSeconds?: number | null;
+        isFinished?: boolean;
+    };
+
+    if (!userId || !movieId) {
+        return res.status(400).json({ success: false, message: 'userId and movieId are required' });
+    }
+
+    const user = db.prepare('SELECT id FROM users WHERE id = ?').get(userId) as { id: number } | undefined;
+    if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const movie = db.prepare('SELECT id FROM movies WHERE id = ?').get(movieId) as { id: number } | undefined;
+    if (!movie) {
+        return res.status(404).json({ success: false, message: 'Movie not found' });
+    }
+
+    const safeProgress = Number.isFinite(progressSeconds)
+        ? Math.max(0, Number(progressSeconds))
+        : 0;
+
+    const safeDuration = Number.isFinite(durationSeconds)
+        ? Math.max(0, Number(durationSeconds))
+        : null;
+
+    const finishedByRatio = safeDuration && safeDuration > 0
+        ? safeProgress / safeDuration >= 0.9
+        : false;
+
+    const shouldMarkFinished = Boolean(isFinished) || finishedByRatio;
+
+    db.prepare(`
+        INSERT INTO watch_history (
+            user_id,
+            movie_id,
+            progress_seconds,
+            duration_seconds,
+            is_finished,
+            last_watched_at
+        )
+        VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        ON CONFLICT(user_id, movie_id)
+        DO UPDATE SET
+            progress_seconds = excluded.progress_seconds,
+            duration_seconds = excluded.duration_seconds,
+            is_finished = excluded.is_finished,
+            last_watched_at = CURRENT_TIMESTAMP
+    `).run(
+        userId,
+        movieId,
+        safeProgress,
+        safeDuration,
+        shouldMarkFinished ? 1 : 0
+    );
+
+    res.json({ success: true });
 });
 
 const moviesPath = path.join(__dirname, 'movies.json');
