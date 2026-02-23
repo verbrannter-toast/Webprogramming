@@ -2,8 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, ChevronDown, User, LogOut } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { Search, ChevronDown } from 'lucide-react';
+import { useRouter, usePathname } from 'next/navigation';
+import UserAvatar from './UserAvatar';
+import { GENRE_CONFIGS } from '../genres/config';
+
+const API_URL = 'http://localhost:5000';
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -42,14 +46,13 @@ export const Navbar = () => {
             <li><Link href="/" className="hover:text-white transition">Home</Link></li>
             <li><Link href="/watchlist" className="hover:text-white transition">My Watchlist</Link></li>
             <>|</>
-            <li><Link href="/genres/comedy" className="hover:text-white transition">Comedy</Link></li>
-            <li><Link href="/genres/action" className="hover:text-white transition">Action</Link></li>
-            <li><Link href="/genres/horror" className="hover:text-white transition">Horror</Link></li>
-            <li><Link href="/genres/romance" className="hover:text-white transition">Romance</Link></li>
-            <li><Link href="/genres/sci-fi" className="hover:text-white transition">Sci-Fi</Link></li>
-            <li><Link href="/genres/drama" className="hover:text-white transition">Drama</Link></li>
-            <li><Link href="/genres/animation" className="hover:text-white transition">Animation</Link></li>
-            <li><Link href="/genres/documentary" className="hover:text-white transition">Documentary</Link></li>
+            {GENRE_CONFIGS.map((genreConfig) => (
+              <li key={genreConfig.slug}>
+                <Link href={`/genres/${genreConfig.slug}`} className="hover:text-white transition">
+                  {genreConfig.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 
