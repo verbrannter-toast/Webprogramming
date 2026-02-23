@@ -27,6 +27,7 @@ export default function LoginPage() {
       if (res.ok && (data.success || data.userId)) {
         const id = data.user?.id || data.userId;
         localStorage.setItem('userId', id.toString());
+        localStorage.setItem('userEmail', email);
         router.push('/');
       } else {
         alert(data.message || "Authentication failed!");
