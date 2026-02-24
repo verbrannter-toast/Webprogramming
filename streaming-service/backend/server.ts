@@ -87,26 +87,18 @@ app.post('/register', (req, res) => {
 });
 
 // update password
-app.post('/account/update-password', (req, res) => {
+app.patch('/account/update-password', (req, res) => {
     const { userId, currentPassword, newPassword } = req.body;
     
-    // Step 1: Verify current password
     const user = db.prepare('SELECT id FROM users WHERE id = ? AND password = ?')
                    .get(userId, currentPassword);
     
     if (!user) {
-        // Current password is wrong
-        return res.status(401).json({ 
-            success: false, 
-            message: "Current password is incorrect" 
-        });
+        return res.status(401).json({ success: false, message: "Current password incorrect" });
     }
     
-    // Step 2: Update to new password
-    db.prepare('UPDATE users SET password = ? WHERE id = ?')
-      .run(newPassword, userId);
-    
-    res.json({ success: true, message: "Password updated successfully" });
+    db.prepare('UPDATE users SET password = ? WHERE id = ?').run(newPassword, userId);
+    res.json({ success: true, message: "Password updated" });
 });
 
 app.get('/account/avatar/:userId', (req, res) => {
@@ -126,6 +118,7 @@ app.get('/account/avatar/:userId', (req, res) => {
     res.json({ success: true, avatarUrl });
 });
 
+// update avatar
 app.post('/account/avatar', (req, res) => {
     const { userId, imageData } = req.body as { userId?: string | number; imageData?: string };
 
@@ -225,22 +218,28 @@ app.get('/watchlist/:userId', (req, res) => {
     }
 });
 
-app.post('/watchlist/toggle', (req, res) => {
+// add to watchlist
+app.post('/watchlist', (req, res) => {
     const { userId, movieId } = req.body;
-    
-    // using a prepared statement for security
-    const stmt = db.prepare('SELECT * FROM watchlists WHERE user_id = ? AND movie_id = ?');
-    const exists = stmt.get(userId, movieId);
+    const stmt = db.prepare('INSERT OR IGNORE INTO watchlists (user_id, movie_id) VALUES (?, ?)');
+    stmt.run(userId, movieId);
+    res.status(201).json({ success: true, message: "Added to watchlist" });
+});
 
-    if (exists) {
-        db.prepare('DELETE FROM watchlists WHERE user_id = ? AND movie_id = ?').run(userId, movieId);
-        res.json({ status: 'removed' });
+// remove from watchlist
+app.delete('/watchlist/:userId/:movieId', (req, res) => {
+    const { userId, movieId } = req.params;
+    const stmt = db.prepare('DELETE FROM watchlists WHERE user_id = ? AND movie_id = ?');
+    const result = stmt.run(userId, movieId);
+    
+    if (result.changes > 0) {
+        res.json({ success: true, message: "Removed from watchlist" });
     } else {
-        db.prepare('INSERT INTO watchlists (user_id, movie_id) VALUES (?, ?)').run(userId, movieId);
-        res.json({ status: 'added' });
+        res.status(404).json({ success: false, message: "Item not found" });
     }
 });
 
+// get watch history for user
 app.get('/history/:userId', (req, res) => {
     const { userId } = req.params;
 
@@ -289,6 +288,7 @@ app.get('/history/:userId', (req, res) => {
     }
 });
 
+// update watch progress
 app.post('/history/progress', (req, res) => {
     const {
         userId,

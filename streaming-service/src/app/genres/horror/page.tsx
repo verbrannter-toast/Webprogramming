@@ -1,4 +1,4 @@
-import GenreMoviesPage from '../GenreMoviesPage';
+import GenreMoviesPage from '../genremoviespage';
 import { getGenreBySlugOrThrow } from '../config';
 
 const genreConfig = getGenreBySlugOrThrow('horror');

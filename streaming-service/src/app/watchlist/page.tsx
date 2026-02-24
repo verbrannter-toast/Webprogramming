@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import type { MovieCardItem } from '../components/movies/types';
 import MovieGridSection from '../components/movies/MovieGridSection';
 import MovieActionCard from '../components/movies/MovieActionCard';
-import type { MovieCardItem } from '../components/movies/types';
 
 const API_URL = 'http://localhost:5000';
 
@@ -39,12 +39,23 @@ export default function Watchlist() {
   }, [userId, allMovies]); // Re-run when either is updated
 
   const removeFromWatchlist = async (movieId: number) => {
-    await fetch(`${API_URL}/watchlist/toggle`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: userId, movieId })
-    });
-    setMyList(prev => prev.filter(m => m.id !== movieId));
+    if (!userId) return;
+
+    try {
+      // We send a DELETE request to the specific resource URL
+      const response = await fetch(`${API_URL}/watchlist/${userId}/${movieId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        // Update local state only if the backend deletion was successful
+        setMyList(prev => prev.filter(m => m.id !== movieId));
+      } else {
+        console.error("Failed to remove item from backend");
+      }
+    } catch (err) {
+      console.error("Connection error:", err);
+    }
   };
 
   return (

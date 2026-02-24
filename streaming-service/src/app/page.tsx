@@ -257,33 +257,36 @@ export default function Home() {
       .catch(err => console.error('Failed to fetch watch history', err));
   }, [userId]);
 
-  const toggleWatchlist = async (event: React.MouseEvent<HTMLButtonElement>, movieId: number) => {
-    event.preventDefault();
-    event.stopPropagation();
+const toggleWatchlist = async (event: React.MouseEvent<HTMLButtonElement>, movieId: number) => {
+  event.preventDefault();
+  event.stopPropagation();
 
-    if (!userId) {
-      alert('Please login to use the watchlist!');
-      return;
+  if (!userId) return alert('Please login!');
+
+  const isAdded = watchlistIds.includes(movieId);
+
+  try {
+    const response = await fetch(
+      isAdded ? `${API_URL}/watchlist/${userId}/${movieId}` : `${API_URL}/watchlist`, 
+      {
+        method: isAdded ? 'DELETE' : 'POST',
+        headers: isAdded ? {} : { 'Content-Type': 'application/json' },
+        body: isAdded ? null : JSON.stringify({ userId, movieId })
+      }
+    );
+
+    if (response.ok) {
+      setWatchlistIds(prev => 
+        isAdded ? prev.filter(id => id !== movieId) : [...prev, movieId]
+      );
+    } else {
+      alert('Operation failed on server');
     }
-
-    try {
-      const response = await fetch(`${API_URL}/watchlist/toggle`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, movieId })
-      });
-
-      const data = await response.json();
-      setWatchlistIds((previousIds) => (
-        data.status === 'added'
-          ? [...previousIds, movieId]
-          : previousIds.filter((id) => id !== movieId)
-      ));
-    } catch (error) {
-      console.error('Error connecting to backend server.', error);
-      alert('Error connecting to backend server.');
-    }
-  };
+  } catch (error) {
+    console.error('Connection error:', error);
+    alert('Error connecting to backend server.');
+  }
+};
 
   const genres = Array.from(new Set(allMovies.map(m => m.genre)));
 

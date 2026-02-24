@@ -37,7 +37,7 @@ const API_URL = 'http://localhost:5000';
   return (
     <div className='bg-[#141414] min-h-screen text-white pt-20 flex justify-center'>
       <div className='flex max-w-7xl w-full'>
-        {/* Left Navigation - 20% */}
+        {/* Left Navigation Panel */}
         
         <aside className='w-1/5 bg-zinc-900 p-5 space-y-2'>
           <UserAvatar
@@ -79,7 +79,7 @@ const API_URL = 'http://localhost:5000';
             </nav>
         </aside>
       
-        {/* Right Content Area - 80% */}
+        {/* Right Content Area */}
         <div className='flex-1 pl-12'>
           {activeTab === 'about' && <AboutSection />}
           {activeTab === 'avatar' && <AvatarSection onAvatarUpdated={setAvatarUrl} />}

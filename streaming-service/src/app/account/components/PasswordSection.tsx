@@ -14,7 +14,7 @@ function PasswordSection () {
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Clear previous alert
+    // clear previous alert
     setAlert(null);
 
     if (newPassword !== confirmPassword) {
@@ -29,7 +29,7 @@ function PasswordSection () {
 
     try {
       const res = await fetch('http://localhost:5000/account/update-password', {
-        method: 'POST',
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, currentPassword, newPassword })
       });
@@ -39,7 +39,7 @@ function PasswordSection () {
       if (data.success) {
         setAlert({type: 'success', message: "Password was changed successfully"})
     
-        // Clear the form
+        // clear form
         setCurrentPassword('');
         setNewPassword('');
         setConfirmPassword('');
