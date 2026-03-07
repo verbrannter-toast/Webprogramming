@@ -6,3 +6,5 @@ streaming-service/node_modules
 streaming-service/next-env.d.ts
 streaming-service/database.db
 user-uploads
+Makefile
+README.md
