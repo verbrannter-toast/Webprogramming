@@ -11,10 +11,10 @@ Ensure you have the following installed on your system:
 - **npm** (v9 or higher)
 
 ## Installation
-
-1. **Clone or navigate to the project directory:**
+1. **Clone and navigate to the project directory:**
    ```bash
-   cd /path/to/Webprogramming/streaming-service
+   git clone https://github.com/verbrannter-toast/Webprogramming.git
+   cd Webprogramming/streaming-service
    ```
 
 2. **Install dependencies:**

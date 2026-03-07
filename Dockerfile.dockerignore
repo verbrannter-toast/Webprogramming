@@ -1,0 +1,8 @@
+# .dockerignore
+
+streaming-service/.github/
+streaming-service/.next
+streaming-service/node_modules
+streaming-service/next-env.d.ts
+streaming-service/database.db
+user-uploads
