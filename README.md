@@ -11,14 +11,33 @@ Ensure you have the following installed on your system:
 - **npm** (v9 or higher)
 
 ## Installation
-
-1. **Clone or navigate to the project directory:**
+0. **Clone and navigate to the project directory:**
    ```bash
-   cd /path/to/Webprogramming/streaming-service
+   git clone https://github.com/verbrannter-toast/Webprogramming.git
+   cd Webprogramming
    ```
 
-2. **Install dependencies:**
+### Running the project in Docker with Make:
+1. Build and run the container
+    ```bash
+    make docker.build
+    make docker.run
+    ````
+2. In your browser, navigate to: http://localhost:3000/
+3. Clean up after using the Container
+    ```bash 
+    make docker.stop
+    make docker.delete_container
+    make docker.delete_image
+    ```
+
+Note: If you cannot use Make, you can just copypaste the Docker commands from Makefile into your terminal
+
+### Running the app natively
+
+**Install dependencies:**
    ```bash
+   cd Webprogramming/streaming-service
    npm install
    ```
 

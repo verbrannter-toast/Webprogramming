@@ -1,4 +1,4 @@
-import GenreMoviesPage from '../genremoviespage';
+import GenreMoviesPage from '../GenreMoviesPage';
 import { getGenreBySlugOrThrow } from '../config';
 
 const genreConfig = getGenreBySlugOrThrow('drama');
