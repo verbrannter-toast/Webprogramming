@@ -58,16 +58,26 @@ export default function GenreMoviesPage({
       return;
     }
 
-    const res = await fetch(`${apiBaseUrl}/watchlist/toggle`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, movieId })
-    });
-    const data = await res.json();
+    const isAdded = watchlistIds.includes(movieId);
 
-    setWatchlistIds((prev) => (
-      data.status === 'added' ? [...prev, movieId] : prev.filter((id) => id !== movieId)
-    ));
+    try {
+      const response = await fetch(
+        isAdded ? `${apiBaseUrl}/watchlist/${userId}/${movieId}` : `${apiBaseUrl}/watchlist`,
+        {
+          method: isAdded ? 'DELETE' : 'POST',
+          headers: isAdded ? {} : { 'Content-Type': 'application/json' },
+          body: isAdded ? null : JSON.stringify({ userId, movieId })
+        }
+      );
+
+      if (response.ok) {
+        setWatchlistIds((prev) =>
+          isAdded ? prev.filter((id) => id !== movieId) : [...prev, movieId]
+        );
+      }
+    } catch (error) {
+      console.error('Error toggling watchlist:', error);
+    }
   };
 
   return (

@@ -34,7 +34,7 @@ export default function MovieActionCard({
                 event.stopPropagation();
                 onAction(movie.id);
               }}
-              className="p-2 bg-white rounded-full text-black hover:bg-gray-200 transition"
+              className="p-2 bg-white rounded-full text-black hover:bg-gray-200 transition cursor-pointer active:scale-90"
             >
               {isActive ? <Check size={16} /> : <Plus size={16} />}
             </button>
@@ -49,7 +49,7 @@ export default function MovieActionCard({
               event.stopPropagation();
               onAction(movie.id);
             }}
-            className="flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded text-sm font-bold hover:bg-red-700"
+            className="flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded text-sm font-bold hover:bg-red-700 cursor-pointer"
           >
             <Trash2 size={16} /> Remove
           </button>
