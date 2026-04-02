@@ -111,7 +111,7 @@ export default function MoviePlayer() {
       <video
         ref={videoRef}
         className="h-full w-full"
-        src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+        src="https://test-streams.mux.dev/tos_ismc/main.m3u8?ref=developerinsider.co"
         controls
         autoPlay
         onLoadedMetadata={(event) => {
