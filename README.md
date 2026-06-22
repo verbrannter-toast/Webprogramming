@@ -1,7 +1,7 @@
 
 # Webprogramming-Module: Streaming Service
 
-A Netflix-like streaming service application built for the Webprogramming module at university. This project demonstrates a full-stack web application with a **Next.js 16 frontend** and an **Express + SQLite backend**, communicating via REST API architecture.
+A Netflix-like streaming service application built for the Webprogramming module at the HWR university of Berlin. This project demonstrates a full-stack web application with a **Next.js 16 frontend** and an **Express + SQLite backend**, communicating via REST API architecture.
 
 
 ## Prerequisites
